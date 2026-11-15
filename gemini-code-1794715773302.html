@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Selamat Ulang Tahun! 🎉</title>
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet" />
+  
+  <!-- Library Confetti -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+  <style>
+    :root {
+      --primary: #ff6b6b;
+      --secondary: #ff8e53;
+      --bg-gradient: linear-gradient(135deg, #fdfbfb 0%, #ebedee 100%);
+      --card-bg: rgba(255, 255, 255, 0.92);
+      --text-main: #2d3436;
+      --text-muted: #636e72;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(120deg, #f6d365 0%, #fda085 100%);
+      color: var(--text-main);
+      overflow-x: hidden;
+      padding: 20px;
+    }
+
+    /* Layar Pembuka (Overlay) */
+    #intro-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, #1e1e2f 0%, #2d2d44 100%);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 100;
+      padding: 20px;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #intro-screen.hidden {
+      opacity: 0;
+      visibility: hidden;
+    }
+
+    .gift-icon {
+      font-size: 4.5rem;
+      margin-bottom: 16px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-20px); }
+      60% { transform: translateY(-10px); }
+    }
+
+    .btn-open {
+      margin-top: 24px;
+      padding: 14px 32px;
+      font-size: 1rem;
+      font-weight: 600;
+      color: white;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      border: none;
+      border-radius: 50px;
+      cursor: pointer;
+      box-shadow: 0 10px 20px rgba(255, 107, 107, 0.35);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .btn-open:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 25px rgba(255, 107, 107, 0.45);
+    }
+
+    /* Tombol Musik Melayang */
+    .music-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: white;
+      border: none;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+      font-size: 1.3rem;
+      cursor: pointer;
+      z-index: 50;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: transform 0.3s ease;
+    }
+
+    .music-btn.playing {
+      animation: spin 4s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /* Kartu Ucapan Utama */
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(10px);
+      max-width: 520px;
+      width: 100%;
+      border-radius: 24px;
+      padding: 40px 32px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+      transform: translateY(30px);
+      opacity: 0;
+      transition: all 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .card.visible {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .photo-frame {
+      width: 130px;
+      height: 130px;
+      margin: 0 auto 20px;
+      border-radius: 50%;
+      padding: 5px;
+      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      box-shadow: 0 8px 20px rgba(255, 107, 107, 0.25);
+    }
+
+    .photo-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+      background: #eee;
+    }
+
+    .subtitle {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--primary);
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      color: var(--text-main);
+      margin-bottom: 18px;
+      line-height: 1.2;
+    }
+
+    .message-box {
+      background: rgba(255, 245, 245, 0.7);
+      border-left: 4px solid var(--primary);
+      padding: 18px;
+      border-radius: 12px;
+      text-align: left;
+      margin-bottom: 24px;
+      min-height: 120px;
+    }
+
+    #typed-message {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      color: var(--text-muted);
+      white-space: pre-line;
+    }
+
+    .sender {
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: var(--text-main);
+      margin-bottom: 24px;
+    }
+
+    .btn-celebrate {
+      padding: 12px 26px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--primary);
+      background: white;
+      border: 2px solid var(--primary);
+      border-radius: 50px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .btn-celebrate:hover {
+      background: var(--primary);
+      color: white;
+    }
+
+    @media (max-width: 480px) {
+      .card { padding: 30px 20px; }
+      h1 { font-size: 1.8rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Audio Musik Latar (Ganti src dengan nama file mp3 lokalmu, misal: lagu.mp3) -->
+  <audio id="bg-music" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/10/25/audio_946bc53b8b.mp3?filename=happy-birthday-to-you-piano-version-13976.mp3" type="audio/mpeg" />
+  </audio>
+
+  <!-- Tombol Kontrol Musik -->
+  <button class="music-btn" id="music-toggle" title="Putar / Jeda Musik" aria-label="Kontrol Musik">
+    🎵
+  </button>
+
+  <!-- Layar Pembuka -->
+  <div id="intro-screen">
+    <div class="gift-icon">🎁</div>
+    <h2>Ada pesan spesial buat kamu...</h2>
+    <p style="color: #b2bec3; margin-top: 8px; font-size: 0.9rem;">Pastikan volume HP/laptop kamu aktif ya!</p>
+    <button class="btn-open" id="open-btn">Buka Kejutan ✨</button>
+  </div>
+
+  <!-- Kartu Ucapan Utama -->
+  <main class="card" id="main-card">
+    <div class="photo-frame">
+      <!-- Ganti src di bawah ini dengan nama file foto kamu, misal: foto.jpg -->
+      <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?auto=format&fit=crop&w=400&q=80" alt="Foto Ulang Tahun" />
+    </div>
+
+    <div class="subtitle">Special Day</div>
+    <h1>Selamat Ulang Tahun, <span id="recipient-name">Nama Dia</span>! 🎂</h1>
+
+    <div class="message-box">
+      <p id="typed-message"></p>
+    </div>
+
+    <p class="sender">Dari: <span id="sender-name">Nama Kamu</span> 🤍</p>
+
+    <button class="btn-celebrate" id="confetti-btn">Rayakan Lagi 🎉</button>
+  </main>
+
+  <script>
+    // ==========================================
+    // PENGATURAN KONTEN (Ubah bagian ini saja)
+    // ==========================================
+    const CONFIG = {
+      namaPenerima: "Nama Dia",
+      namaPengirim: "Nama Kamu",
+      pesanUcapan: `Selamat bertambah usia! Semoga di tahun yang baru ini selalu diberikan kesehatan, kebahagiaan, dan kelancaran untuk semua rencana serta impian yang sedang dikejar.\n\nTerima kasih sudah menjadi sosok yang luar biasa. Terus bersinar dan nikmati hari spesialmu hari ini!`
+    };
+
+    // Inisialisasi elemen DOM
+    const introScreen = document.getElementById('intro-screen');
+    const openBtn = document.getElementById('open-btn');
+    const mainCard = document.getElementById('main-card');
+    const bgMusic = document.getElementById('bg-music');
+    const musicToggle = document.getElementById('music-toggle');
+    const confettiBtn = document.getElementById('confetti-btn');
+    const typedMessageEl = document.getElementById('typed-message');
+
+    // Terapkan nama dari CONFIG
+    document.getElementById('recipient-name').textContent = CONFIG.namaPenerima;
+    document.getElementById('sender-name').textContent = CONFIG.namaPengirim;
+
+    let isPlaying = false;
+
+    // Fungsi menembakkan confetti
+    function fireConfetti() {
+      confetti({
+        particleCount: 90,
+        spread: 75,
+        origin: { y: 0.6 }
+      });
+    }
+
+    // Fungsi efek mengetik teks
+    function typeWriter(text, i = 0) {
+      if (i < text.length) {
+        typedMessageEl.textContent += text.charAt(i);
+        setTimeout(() => typeWriter(text, i + 1), 35);
+      }
+    }
+
+    // Event saat tombol "Buka Kejutan" diklik
+    openBtn.addEventListener('click', () => {
+      introScreen.classList.add('hidden');
+      mainCard.classList.add('visible');
+
+      // Putar musik otomatis
+      bgMusic.play().then(() => {
+        isPlaying = true;
+        musicToggle.classList.add('playing');
+      }).catch(() => {
+        // Jika gagal autoplay, user tetap bisa klik tombol musik manual
+        isPlaying = false;
+      });
+
+      // Jalankan confetti & efek ketik
+      setTimeout(() => {
+        fireConfetti();
+        typeWriter(CONFIG.pesanUcapan);
+      }, 400);
+    });
+
+    // Event tombol Play / Pause musik
+    musicToggle.addEventListener('click', () => {
+      if (isPlaying) {
+        bgMusic.pause();
+        musicToggle.textContent = '🔇';
+        musicToggle.classList.remove('playing');
+      } else {
+        bgMusic.play();
+        musicToggle.textContent = '🎵';
+        musicToggle.classList.add('playing');
+      }
+      isPlaying = !isPlaying;
+    });
+
+    // Event tombol "Rayakan Lagi"
+    confettiBtn.addEventListener('click', fireConfetti);
+  </script>
+</body>
+</html>
